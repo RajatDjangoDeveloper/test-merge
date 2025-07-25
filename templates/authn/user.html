@@ -1,0 +1,272 @@
+{% extends "authn/base.html" %}
+{% load static %}
+
+{% block content_head %}
+
+
+{% endblock %}
+
+
+{% block content_body %}
+<!-- model for trigger button  user data -->
+<button type="button" class="col-lg-2 d-flex flex-column  btn btn-success template-demo" 
+    data-bs-toggle="modal" data-bs-target="#add-user-model"><i class="fa fa-plus"
+        aria-hidden="true">Add User</i></button>
+
+<!-- model for Add user data -->
+<div class="modal fade" id="add-user-model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/add_user" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="form-group col-md-12">
+                            <!-- for Add username -->
+                            <label>Username</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" name="Add_user_name" id="Add_user_name" required>
+                            <!-- for Add email -->
+                            <label>Email</label><strong style="color:red;">*</strong>
+                            <input type="email" class="form-control" id="Add_user_email" name="Add_user_email" required>
+                            <br>
+                            <!-- for Add password -->
+                            <label>Password</label><strong style="color:red;">*</strong>
+                            <input type="password" class="form-control" name="Add_user_pwd" id="Add_user_pwd" required>
+                            <!-- for confirm password -->
+                            <label>Confirm Password</label><strong style="color:red;">*</strong>
+                            <input type="password" class="form-control" name="Add_user_pwd2" id="Add_user_pwd2"
+                                required>
+                            <label>Role fields</label><strong style="color:red;">*</strong>
+                            <select class="select2 form-control" name="add_role" id="add_role" data-placeholder="Select role"
+                                style="width: 100%;" required>
+                                <option value="" selected disabled></option>
+                                {% for user in all_role_data %}
+                                <option value="{{ user.id }}">{{ user.role }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" onclick="matchPassword()" class="btn btn-primary">Create</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- datatable  -->
+<div class="col-lg-12 d-flex flex-column">
+    <table id="example1" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<!-- Edit-user-role-Modal -->
+<div class="modal fade" id="Edit_Model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit User</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/edit_user" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="form-group col-md-12">
+                            <!-- id for edit user  -->
+                            <input type="hidden" name="user_id" id="user_id"> <br>
+                            <!-- for edit username -->
+                            <label>Username</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" name="edit_user_name" id="edit_user_name" required>
+                            <!-- for edit email -->
+                            <label>Email</label><strong style="color:red;">*</strong>
+                            <input type="email" class="form-control" id="edit_user_email" name="edit_user_email"
+                                required>
+                            <!-- for edit password -->
+                            <label>Password</label><strong style="color:red;">*</strong>
+                            <input type="password" class="form-control" name="edit_user_pwd" id="edit_user_pwd" required>
+                            <!-- for confirm edit password -->
+                            <label>Confirm Password</label><strong style="color:red;">*</strong>
+                            <input type="password" class="form-control" name="edit_user_pwd2" id="edit_user_pwd2">
+                            <!-- for edit role field -->
+                            <label>Role fields</label><strong style="color:red;">*</strong>
+                            <select class="select2 form-control" name="edit_role" id="edit_role" data-placeholder="Select role"
+                                style="width: 100%;" required>
+                                <option value="" selected disabled></option>
+                                {% for user in all_role_data %}
+                                <option value="{{ user.id }}">{{ user.role }}</option>
+                                {% endfor %}
+                            </select>
+                            <!-- <input type="text" class="form-control" name="edit_user_role" id="edit_user_role"> -->
+                            <!-- <select class="select2" name="edit_user_role" id="edit_user_role" data-placeholder="Select role"
+                                style="width: 100%;" required>
+                                <option value="" selected disabled></option>
+                                {% for user in all_role_data %}
+                                <option value="{{ user.id }}">{{ user.role }}</option>
+                                {% endfor %}
+                            </select> -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- pop-up delete Model-->
+<div class="modal fade" id="Delete-Model">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="/delete_user">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete <i class="fa fa-trash"></i></h4>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this record <i class="fa fa-question-circle"></i></p>
+                </div>
+                <div class="modal-footer">
+                    <input type="number" id="delete_id" name="delete_id" hidden>
+                    <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+    function matchPassword() {
+        var pw1 = document.getElementById("Add_user_pwd");
+        var pw2 = document.getElementById("Add_user_pwd2");
+        if (pw1 != pw2) {
+            alert("Passwords did not match");
+        } else {
+            alert("Password created successfully");
+        }
+    }  
+</script>
+
+<script>
+    function matchPassword1() {
+        var pw1 = document.getElementById("edit_user_pwd");
+        var pw2 = document.getElementById("edit_user_pwd2");
+        if (pw1 != pw2) {
+            alert("Passwords did not match");
+        } else {
+            alert("Password created successfully");
+        }
+    }  
+</script>
+
+<script>
+
+    $(document).ready(function () {
+        $('#select2').select2();
+    });
+    // $(document).ready(function () {
+    //     $('.select2').select2();
+    // });
+
+    // -------- dataTable Ajax processing START -----------
+    $(document).ready(function () {
+        $('#example1').dataTable({
+            "ordering": true,
+            "PagingType": 'simple',
+            "processing": false,
+            "serverSide": false,
+            "autoWidth": false,
+            "searchDelay": 1000,
+            "order": [[0, "desc"]],
+            "ajax": "show_user_data",
+            "language": {
+                "emptyTable": "No data available in table!!"
+            },
+            "columns": [
+                { "data": "username" },
+                { "data": "email_address" },
+                { "data": "role_fields__role" },
+                { "data": "id", render: action_button }
+            ],
+        });
+
+        function action_button(data, type, row, meta) {
+            return '<center><button type="button" class="btn btn-success btn-rounded btn-icon" onClick="Edit(' + row['id'] + ')" data-bs-toggle="modal" data-bs-target="#Edit_Model" title="Edit"><i class="fa fa-edit"></i></button><button type="button" class="btn btn-danger mr-2" onClick="Delete(' + row['id'] + ')" data-bs-toggle="modal" data-bs-target="#Delete-Model" title="Delete"><i class="fa fa-trash fa-5x"></i></button></center>'
+        }
+
+    });
+
+</script>
+
+<script>
+    function Edit(id) {
+        console.log('===> Edit:', id);
+        if (id) {
+            // Here we are calling ajax for filling data into edit Student
+            $.ajax({
+                url: '/get_user_ajax',
+                type: 'post',
+                async: false,
+                cache: false,
+                data: {
+                    'id': id
+                },
+                success: function (data) {
+                    console.log('===> data:', data);
+                    $('#user_id').val(data['id']);
+                    $('#edit_user_name').val(data['username']);
+                    $('#edit_user_email').val(data['email_address']);
+                    $('#edit_user_pwd').val(data['password']);
+                    // $('#edit_user_role').val(data['role_fields']);
+                    $('#edit_user_role').select2().val(data['role_fields.role']).trigger('change'); 
+                    console.log('===> data:', role_fields.role);
+                }
+            });
+        }
+    }
+</script>
+
+<!-- ajax for delete-->
+<script>
+    function Delete(id) {
+        console.log('===> :', id);
+        if (id) {
+            $('#delete_id').val(id);
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,485 @@
+{% extends "authn/base.html" %}
+{% load static %}
+
+{% block content_head %}
+
+
+{% endblock %}
+
+
+{% block content_body %}
+<!-- model for view data -->
+<div class="modal fade " id="View_Model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">View Devices</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group ">
+                            <!-- id for view  -->
+                            <input type="hidden" name="view_device_id" id="view_device_id"> <br>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Assignee</label>
+                            <input type="text" class="form-control" id="view_device_assignee" name="view_device_assignee"
+                                disabled>
+                        </div>
+                        <div class="form-group col-md-6">   
+                            <label>Device Type</label>
+                            <input type="text" class="form-control" id="view_device_type" name="view_device_type"
+                                disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Service Tag</label>
+                            <input type="text" class="form-control" id="view_service_tag" name="view_service_tag"
+                                disabled>
+                        </div>
+                        <div class="form-group col-md-6">     
+                            <label>Brand</label>
+                            <input type="text" class="form-control" id="view_brand" name="view_brand" disabled>
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="form-group col-md-6">   
+                            <label>Model No</label>
+                            <input type="text" class="form-control" id="view_model_no" name="view_model_no" disabled>
+                        </div>
+                        <div class="form-group col-md-6">     
+                            <label>model Name</label>
+                            <input type="text" class="form-control" id="view_model_name" name="view_model_name"
+                                disabled>
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="form-group col-md-6">       
+                            <label>Ram</label>
+                            <input type="text" class="form-control" id="view_ram" name="view_ram" disabled>
+                        </div>
+                        <div class="form-group col-md-6"> 
+                            <label>Memory</label>
+                            <input type="text" class="form-control" id="view_memory" name="view_memory" disabled>
+                        </div>
+                    </div> 
+                    <div class="form-row">
+                        <!-- <div class="form-group col-md-12">
+                            <label>Blog Description</label><strong style="color:red;">*</strong>
+                            <p><b>Note:</b> Please enter only text in "\n" separate formate.
+                                i.e. title1 \n title2 \n title3</p>
+                            <textarea id="add_blogdesc" name="add_blogdesc" rows="6" cols="80"
+                                      class="form-control"
+                                      placeholder="Enter Blog Description" required="required"></textarea>
+                        </div> -->
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label>Additional Comment</label>
+                            <textarea class="form-control" rows="6" cols="80"  id="view_device_additional_comments" name="view_device_additional_comments" id="comment" disabled></textarea>
+                            <!-- <input type="textarea" class="form-control" id="view_device_additional_comments" name="view_device_additional_comments" disabled> -->
+                        </div>
+                        <div class="form-group col-md-12">      
+                            <label>Location</label>
+                            <input type="text" class="form-control" id="view_location" name="view_location" disabled>
+                            <!-- <label>>created date</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="view_device_type" name="edit_designation" >
+                            <label>Updated date</label><strong style="color:red;">*</strong> -->
+                        </div>
+                    </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- model for trigger button  add device type data -->
+<button type="button" class="col-lg-2 d-flex flex-column  btn btn-success template-demo" class="" data-bs-toggle="modal"
+    data-bs-target="#add-user-model"><i class="fa fa-plus" aria-hidden="true">Add Devices</i></button>
+
+<!-- model for add device type data -->
+<div class="modal fade" id="add-user-model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Devices</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/add_devices" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                            <label>Assignee</label>
+                            <input type="text" class="form-control" id="add_device_assignee" name="add_device_assignee">
+                        </div>
+                        <div class="form-group col-md-6"> 
+                            <label>Device Type</label><strong style="color:red;">*</strong>
+                            <select class="form-control" name="add_device_type" id="add_device_type"
+                            data-placeholder="Select Device" style="width: 100%;" required>
+                            <option value="" selected disabled></option>
+                            {% for device in all_device_type %}
+                                <option value="{{ device.id }}">{{ device.device_type }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Service Tag</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="add_service_tag" name="add_service_tag">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Brand</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="add_brand" name="add_brand">
+                        </div>
+                    </div>  
+                    <div class="row">
+                        <div class="form-group col-md-6">  
+                            <label>Model No</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="add_model_no" name="add_model_no">
+                        </div>
+                        <div class="form-group col-md-6">   
+                            <label>Model Name</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="add_model_name" name="add_model_name">
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="form-group col-md-6">   
+                            <label>Ram</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="add_ram" name="add_ram">
+                        </div>
+                        <div class="form-group col-md-6">     
+                            <label>Memory</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="add_memory" name="add_memory">
+                        </div>
+                    </div>    
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <div class="form-group col-md-12">
+                                <label>Additional Comment</label>
+                                <textarea class="form-control" rows="6" cols="80"  id="add_device_additional_comments" name="add_device_additional_comments" id="comment" ></textarea>
+                                <!-- <input type="textarea" class="form-control" id="view_device_additional_comments" name="view_device_additional_comments" disabled> -->
+                        </div>
+                            <div class="form-group col-md-12"> 
+                                <label>Location</label><strong style="color:red;">*</strong>
+                                <select class="form-control" name="add_location" id="add_location"
+                                data-placeholder="Select Device" style="width: 100%;" required>
+                                <option value="" selected disabled></option>
+                                {% for device in all_location %}
+                                    <option value="{{ device.id }}">{{ device.location }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>        
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- model for Edit device type data -->
+<div class="modal fade" id="Edit_Model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Devices</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/edit_devices" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                            <!-- device id -->
+                            <input type="hidden" name="device_id" id="device_id"> <br>
+                    <div class="row">
+                        <div class="form-group col-md-6">        
+                            <label>Assignee</label>
+                            <input type="text" class="form-control" id="edit_device_assignee" name="edit_device_assignee">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Device Type</label><strong style="color:red;">*</strong>
+                            <select class="form-control" name="edit_device_type_name" id="edit_device_type_name"
+                            data-placeholder="Select Location" style="width: 100%;" required >
+                            <option value="" selected disabled></option>
+                            {% for device in all_device_type %}
+                                <option value="{{ device.id }}">{{ device.device_type }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="form-group col-md-6">    
+                            <label>Service_tag</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="edit_service_tag" name="edit_service_tag" >
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Brand</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="edit_brand" name="edit_brand" >
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="form-group col-md-6">         
+                            <label>Model No</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="edit_model_no" name="edit_model_no" >
+                        </div>
+                        <div class="form-group col-md-6">    
+                            <label>Model Name</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="edit_model_name" name="edit_model_name" >
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="form-group col-md-6">   
+                            <label>Ram</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="edit_ram" name="edit_ram">
+                        </div>
+                        <div class="form-group col-md-6">     
+                            <label>Memory</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="edit_memory" name="edit_memory">
+                        </div>
+                    </div> 
+                    <div class="form-group col-md-12">
+                        <div class="form-group col-md-12">
+                            <label>Additional Comment</label>
+                            <textarea class="form-control" rows="6" cols="80"  id="edit_device_additional_comments" name="edit_device_additional_comments" id="comment" ></textarea>
+                            <!-- <input type="textarea" class="form-control" id="view_device_additional_comments" name="view_device_additional_comments" disabled> -->
+                    </div>
+                        <div class="form-group col-md-12">     
+                            <label>Location</label><strong style="color:red;">*</strong>
+                            <select class="form-control" name="edit_location" id="edit_location"
+                            data-placeholder="Select Device" style="width: 100%;" required>
+                            <option value="" selected disabled></option>
+                            {% for device in all_location %}
+                                <option value="{{ device.id }}">{{ device.location }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>    
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- pop-up delete Model-->
+<div class="modal fade" id="Delete-Model">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="/delete_devices">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete <i class="fa fa-trash"></i></h4>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this record <i class="fa fa-question-circle"></i></p>
+                </div>
+                <div class="modal-footer">
+                    <input type="number" id="delete_id" name="delete_id" hidden>
+                    <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- datatable for  role  -->
+<div class="col-lg-12 d-flex flex-column">
+    <table id="example1" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Assignee</th>
+                <th>Device Type</th>
+                <!-- <th>service_tag</th> -->
+                <th hidden>Brand</th>
+                <th>Model No</th>
+                <th hidden>Model Name</th>
+                <th>ram</th>
+                <!-- <th>memory</th> -->
+                <th>Location</th>
+                <th>Created date</th>
+                <th>Updated date</th>
+                <!-- <th>Is approve</th> -->
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+
+{% block javascript %}
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+
+<script>
+
+    $('.select2').select2();
+
+    $(document).ready(function () {
+        $('#example1').dataTable({
+            "ordering": true,
+            "PagingType": 'simple',
+            "processing": true,
+            "serverSide": false,
+            "autoWidth": false,
+            "searchDelay": 1000,
+            "order": [[0, "desc"]],
+            "ajax": "/show_devices_data",
+            "language": {
+                "emptyTable": "No data available in table!!"
+            },
+            "columns": [
+                { "data": "assignee" },
+                { "data": "device_type_name__device_type" },
+                //   {"data": "service_tag"},
+                // { "data": "brand" },
+                { "data": "model_no" },
+                // { "data": "model_name" },
+                { "data": "ram" },
+                //   {"data": "memory"},
+                { "data": "location_name__location" },
+                { "data": "create_dt", render: utc_to_date },
+                { "data": "updated_dt", render: utc_to_date },
+                // { "data": "is_approve", render: approve_button_show },
+                { "data": "id", render: action_button },
+            ]
+        });
+
+        function action_button(data, type, row, meta) {
+            return '<center><button type="button" class="btn btn-success btn-rounded btn-icon" onClick="View(' + row['id'] + ')" data-bs-toggle="modal" data-bs-target="#View_Model" title="View"><i class="fa fa-eye"></i></button><button type="button" class="btn btn-success btn-rounded btn-icon" onClick="Edit(' + row['id'] + ')" data-bs-toggle="modal" data-bs-target="#Edit_Model" title="Edit"><i class="fa fa-edit"></i></button><button type="button" class="btn btn-danger mr-2" onClick="Delete(' + row['id'] + ')" data-bs-toggle="modal" data-bs-target="#Delete-Model" title="Delete"><i class="fa fa-trash fa-5x"></i></button></center>'
+        }
+        // for date fetching into create_dt 
+        function utc_to_date(data, type, row, meta) {
+            return new Date(data).toString().slice(4, 24);
+            console.log('===> Time:', data, type, row, meta);
+        }
+
+        function approve_button_show(data, type, row, meta) {
+            if (data === true) {
+                return '<button type="button" class="btn btn-secondary btn-sm is_approve" value="' + row['id'] + '" data-value="False"> <i class="fa fa-times">&nbsp;&nbsp;</i>Disapprove </button>';
+            } else {
+                return '<button type="button" class="btn btn-primary btn-sm is_approve" value="' + row['id'] + '" data-value="True"> <i class="fa fa-check">&nbsp;&nbsp;</i>Approve </button>';
+            }
+        }
+
+        //   function admin_username(data, type, row, meta) {
+        //   if (data === null) {
+        //       return '-';
+        //   } else {
+        //       return data;
+        //   }
+        //       }    
+
+    });
+</script>
+
+<!-- view filling funcnality -->
+<script>
+    function View(id) {
+        console.log('===> View:', id);
+        if (id) {
+            // Here we are calling ajax for filling data into edit Student
+            $.ajax({
+                url: '/get_view_fun_devices_ajax',
+                type: 'post',
+                async: false,
+                cache: false,
+                data: {
+                    'id': id
+                },
+                success: function (data) {
+                    $('#view_device_id').val(data['id']);
+                    $('#view_device_type').val(data['device_type_name']);
+                    $('#view_service_tag').val(data['service_tag']);
+                    $('#view_brand').val(data['brand']);
+                    $('#view_model_no').val(data['model_no']);
+                    $('#view_model_name').val(data['model_name']);
+                    $('#view_ram').val(data['ram']);
+                    $('#view_memory').val(data['memory']);
+                    $('#view_location').val(data['location_name']);
+                    $('#view_device_assignee').val(data['assignee']);
+                    $('#view_device_additional_comments').val(data['additional_comment']);
+                    
+
+                }
+            });
+        }
+    }
+</script>
+<script>
+    function Edit(id) {
+        console.log('===> Edit:', id);
+        if (id) {
+            // Here we are calling ajax for filling data into edit Student
+            $.ajax({
+                url: '/get_devices_ajax',
+                type: 'post',
+                async: false,
+                cache: false,
+                data: {
+                    'id': id
+                },
+                success: function (data) {
+                    console.log('===> data:', data);
+                    $('#device_id').val(data['id']);
+                    $('#edit_device_type').select2().val(data['device_type_name.device_type']).trigger('change'); 
+                    $('#edit_service_tag').val(data['service_tag']);
+                    $('#edit_brand').val(data['brand']);
+                    $('#edit_model_no').val(data['model_no']);
+                    $('#edit_model_name').val(data['model_name']);
+                    $('#edit_ram').val(data['ram']);
+                    $('#edit_memory').val(data['memory']);
+                    $('#edit_location1').select2().val(data['location_name.location']).trigger('change'); 
+                    $('#edit_device_assignee').val(data['assignee']);
+                    $('#edit_device_additional_comments').val(data['additional_comment']);//  ####
+                    // console.log('===> data:', role_fields.role);
+                }
+            });
+        }
+    }
+</script>
+<script>
+    function Delete(id) {
+        // console.log('===> :', id);
+        if (id) {
+            $('#delete_id').val(id);
+        }
+    }
+</script>
+{% endblock %}

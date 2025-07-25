@@ -1,0 +1,212 @@
+{% extends "authn/base.html" %}
+{% load static %}
+
+{% block content_head %}
+
+
+{% endblock %}
+
+
+{% block content_body %}
+<!-- model for trigger button  add device type data -->
+<button type="button" class="col-lg-2 d-flex flex-column  btn btn-success template-demo" class="" data-bs-toggle="modal"
+    data-bs-target="#add-user-model"><i class="fa fa-plus" aria-hidden="true">Add Department</i></button>
+
+<!-- model for add device type data -->
+<div class="modal fade" id="add-user-model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Department</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/add_department_data" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="form-group col-md-12">
+                        
+                            <label>Department</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="add_department_name" name="add_department_name" > <br>
+                            
+                        </div>  
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- model for Edit user data -->
+<div class="modal fade" id="Edit_Model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Department</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/edit_department_name" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="form-group col-md-12">
+                             <!-- id for edit role  -->
+                             <input type="hidden" name="department_name_id" id="department_name_id"> <br>
+                           
+                            <label>Department</label><strong style="color:red;">*</strong>
+                            <input type="text" class="form-control" id="edit_department_name" name="edit_department_name" > <br>
+                            
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- pop-up delete Model-->
+<div class="modal fade" id="Delete-Model">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="/delete_department_name">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete <i class="fa fa-trash"></i></h4>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this record <i class="fa fa-question-circle"></i></p>
+                </div>
+                <div class="modal-footer">
+                    <input type="number" id="delete_id" name="delete_id" hidden>
+                    <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- datatable for  role  -->
+<div class="col-lg-12 d-flex flex-column">
+    <table id="example1" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Department</th>
+                <th>created date</th>
+                <th>Updated date</th>
+                <!-- <th>Is approve</th> -->
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+  </div>
+
+{% endblock %}
+
+
+{% block javascript %}
+
+<script>
+    
+    $('.select2').select2();
+    
+    $(document).ready(function () {
+      $('#example1').dataTable({
+          "ordering": true,
+          "PagingType": 'simple',
+          "processing": true,
+          "serverSide": false,
+          "autoWidth": false,
+          "searchDelay": 1000,
+          "order": [[1, "desc"]],
+          "ajax": "/show_department_data",
+          "language": {
+              "emptyTable": "No data available in table!!"
+          },
+          "columns": [
+              // {"data": "name"},
+              {"data": "department_name"},
+              {"data": "create_dt",render: utc_to_date},
+              {"data": "updated_dt",render: utc_to_date},
+            //   {"data": "is_approve",render: approve_button_show},
+              {"data": "id", render: action_button},
+          ]
+      });
+  
+      function action_button(data, type, row, meta) {
+              return '<center><button type="button" class="btn btn-success btn-rounded btn-icon" onClick="Edit(' + row['id'] + ')" data-bs-toggle="modal" data-bs-target="#Edit_Model" title="Edit"><i class="fa fa-edit"></i></button><button type="button" class="btn btn-danger mr-2" onClick="Delete(' + row['id'] + ')" data-bs-toggle="modal" data-bs-target="#Delete-Model" title="Delete"><i class="fa fa-trash fa-5x"></i></button></center>'
+          }
+      // for date fetching into create_dt 
+      function utc_to_date(data, type, row, meta){
+      return new Date(data).toString().slice(4, 24);
+      console.log('===> Time:', data, type, row, meta);
+          }
+  
+      function approve_button_show(data, type, row, meta) {
+      if (data === true) {
+          return '<button type="button" class="btn btn-secondary btn-sm is_approve" value="' + row['id'] + '" data-value="False"> <i class="fa fa-times">&nbsp;&nbsp;</i>Disapprove </button>';
+      } else {
+          return '<button type="button" class="btn btn-primary btn-sm is_approve" value="' + row['id'] + '" data-value="True"> <i class="fa fa-check">&nbsp;&nbsp;</i>Approve </button>';
+      }
+          }
+          
+    //   function admin_username(data, type, row, meta) {
+    //   if (data === null) {
+    //       return '-';
+    //   } else {
+    //       return data;
+    //   }
+    //       }    
+   
+   });
+</script>
+<!-- edit filling funcnality -->
+<script>
+    function Edit(id) {
+        console.log('===> Edit:', id);
+        if (id) {
+            // Here we are calling ajax for filling data into edit Student
+            $.ajax({
+                url: '/get_department_name_ajax',
+                type: 'post',
+                async: false,
+                cache: false,
+                data: {
+                    'id': id
+                },
+                success: function (data) {
+                    $('#department_name_id').val(data['id']);
+                    $('#edit_department_name').val(data['department_name']);
+                 
+                }
+            });
+        }
+    }
+</script>
+<!-- ajax for delete-->
+<script>
+    function Delete(id) {
+        // console.log('===> :', id);
+        if (id) {
+            $('#delete_id').val(id);
+        }
+    }
+</script>
+{% endblock %}
